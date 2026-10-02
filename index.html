@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cozinha da Tere</title>
+
+<!-- Fontes e biblioteca de PDF (mesmas usadas no site publicado) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Estilos -->
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<!-- Símbolo SVG da logo, reaproveitado em dois lugares via <use> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lg-tere" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFC21A"/><stop offset="1" stop-color="#F26B1D"/></linearGradient>
+<symbol id="logo-tere" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="31" fill="url(#lg-tere)"/>
+  <circle cx="32" cy="32" r="27.5" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5" stroke-dasharray="2 3"/>
+  <g fill="#FFF8EE">
+    <circle cx="23.5" cy="27" r="7.5"/><circle cx="32" cy="22.5" r="9.5"/><circle cx="40.5" cy="27" r="7.5"/>
+    <rect x="21.5" y="27" width="21" height="12" rx="2"/>
+    <rect x="21.5" y="41" width="21" height="6.5" rx="2.5"/>
+  </g>
+  <path d="M27.5 31v6M32 30v7M36.5 31v6" stroke="#F26B1D" stroke-opacity=".28" stroke-width="1.6" stroke-linecap="round"/>
+</symbol></defs></svg>
+
+<header class="cabecalho">
+  <!-- Toque 5x na marca também abre a Administração escondida -->
+  <button type="button" class="marca" onclick="cliqueMarca()" aria-label="Cozinha da Tere">
+    <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#logo-tere"/></svg>
+    <span class="marca-txt">
+      <span class="marca-nome">Cozinha da Tere</span>
+      <span class="subtitulo"><span class="divisor" aria-hidden="true"></span>Pegou, anotou, pagou no dia 1</span>
+    </span>
+  </button>
+  <nav id="nav-principal" aria-label="Navegação principal">
+    <button id="nav-loja" class="ativo" type="button" aria-current="page" onclick="mostrarAba('loja')">Loja</button>
+    <button id="nav-admin" type="button" onclick="mostrarAba('admin')">Administração</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ABA LOJA -->
+<section id="aba-loja" aria-label="Loja">
+
+  <header class="banner">
+    <div class="banner-txt">
+      <p class="banner-tag">Loja da cozinha</p>
+      <h1 id="banner-titulo">O que vai ser hoje?</h1>
+      <p>Escolha, monte o carrinho e pronto: tudo entra na sua conta do mês.</p>
+    </div>
+    <div class="banner-pratos" id="banner-pratos" aria-hidden="true"></div>
+    <ul class="banner-selos">
+      <li>🧾 Pague no dia 1</li>
+      <li>⚡ Pedido em segundos</li>
+      <li>🍰 +60 produtos</li>
+    </ul>
+  </header>
+
+  <!-- Passo 1: cadastro de quem está pegando o pedido -->
+  <section id="bloco-cadastro" class="card boas-vindas" aria-labelledby="titulo-cadastro">
+    <div class="bv-topo">
+      <svg class="bv-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#logo-tere"/></svg>
+      <div>
+        <p class="passo">Passo 1 de 2</p>
+        <h2 id="titulo-cadastro">Vamos começar?</h2>
+        <p>Preencha seus dados uma vez e escolha o que levou da cozinha.</p>
+      </div>
+    </div>
+    <form id="form-cadastro" onsubmit="confirmarCadastro(); return false;">
+      <div class="row">
+        <div class="col campo">
+          <label for="c-nome">Nome</label>
+          <div class="campo-wrap">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            <input id="c-nome" name="nome" placeholder="Seu nome" autocomplete="name" required>
+          </div>
+        </div>
+        <div class="col campo">
+          <label for="c-numero">Contato</label>
+          <div class="campo-wrap">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2C10.5 21 3 13.5 3 6a2 2 0 0 1 2-2Z"/></svg>
+            <input id="c-numero" name="contato" type="tel" inputmode="tel" placeholder="(00) 00000-0000" autocomplete="tel" required>
+          </div>
+        </div>
+        <div class="col campo">
+          <label for="c-equipe">Equipe</label>
+          <div class="campo-wrap">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 2.8-6 6-6s6 2.5 6 6"/><path d="M13.5 14.3c2.6.4 4.5 2.6 4.5 5.7"/></svg>
+            <select id="c-equipe" name="equipe" required>
+              <option value="" disabled selected>Selecione sua equipe</option>
+              <option>EVA</option><option>VIVA</option><option>ED</option><option>BANCAR</option><option>DEV</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-grande">Ver cardápio <span aria-hidden="true">→</span></button>
+      <p class="small nota">Seus dados servem só para o acompanhamento e a cobrança do mês.</p>
+    </form>
+  </section>
+
+  <!-- Passo 2: cardápio e carrinho (só aparece depois do cadastro) -->
+  <section id="bloco-loja" class="hidden" aria-label="Cardápio">
+    <p class="alerta" role="status">
+      Pegando pedido para: <strong id="resumo-usuario"></strong> ·
+      <button type="button" class="link-botao" onclick="trocarUsuario()">trocar</button>
+    </p>
+
+    <section id="almoco" class="almoco hidden" aria-labelledby="titulo-almoco">
+      <h2 id="titulo-almoco" class="secao-titulo"><span>🍽️ Almoço da semana</span><span class="risco" aria-hidden="true"></span></h2>
+      <p id="almoco-sub" class="small almoco-sub"></p>
+      <div id="almoco-dias" class="almoco-dias"></div>
+    </section>
+
+    <section id="destaques" class="destaques hidden" aria-labelledby="titulo-destaques">
+      <h2 id="titulo-destaques" class="secao-titulo"><span>⭐ Sugestões da casa</span><span class="risco" aria-hidden="true"></span></h2>
+      <div id="carrossel" class="carrossel"></div>
+    </section>
+
+    <div class="busca" role="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <label for="busca" class="rotulo-oculto">Buscar produto</label>
+      <input id="busca" type="search" placeholder="Buscar produto…" oninput="filtrarProdutos(this.value)" autocomplete="off">
+    </div>
+
+    <nav id="nav-categorias" class="quick-nav" aria-label="Categorias do cardápio"></nav>
+    <div id="secoes-produtos"></div>
+    <p id="busca-vazia" class="busca-vazia hidden">Nenhum produto encontrado. Tente outro nome.</p>
+  </section>
+
+</section>
+
+<!-- ABA ADMIN -->
+<section id="aba-admin" class="hidden" aria-label="Administração">
+
+  <section id="admin-login" class="card painel-login" aria-labelledby="titulo-login">
+    <h2 id="titulo-login" class="secao-titulo"><span>🔒 Acesso restrito</span></h2>
+    <p class="small">Área exclusiva do responsável pela cozinha.</p>
+    <p class="small status-sync" role="status"></p>
+    <form id="form-login" onsubmit="entrarAdmin(); return false;">
+      <div class="campo-simples">
+        <label for="adm-user">Login</label>
+        <input id="adm-user" name="login" autocomplete="username">
+      </div>
+      <div class="campo-simples">
+        <label for="adm-pass">Senha</label>
+        <input id="adm-pass" name="senha" type="password" autocomplete="current-password">
+      </div>
+      <p id="adm-erro" class="erro-login" role="alert"></p>
+      <div class="acoes-login">
+        <button id="adm-entrar" class="btn" type="submit">Entrar</button>
+        <button class="btn secundario" type="button" onclick="mostrarAba('loja')">Voltar à loja</button>
+      </div>
+    </form>
+  </section>
+
+  <div id="admin-painel" class="hidden">
+    <div class="cabecalho-painel">
+      <span class="small status-sync" role="status"></span>
+      <button class="btn secundario" type="button" onclick="sairAdmin()">Sair da administração</button>
+    </div>
+
+    <div id="stats-grid" class="stats-grid" aria-label="Resumo do mês"></div>
+
+    <section class="card painel-admin" aria-labelledby="titulo-cardapio-admin">
+      <h2 id="titulo-cardapio-admin" class="secao-titulo"><span>🍽️ Almoço da semana (segunda a sábado)</span><span class="risco" aria-hidden="true"></span></h2>
+      <p class="small">Digite o nome do prato de cada dia. Aparece no topo da loja, em "Almoço da semana". Deixe em branco o dia sem prato.</p>
+      <div id="cardapio-form" class="cardapio-form"></div>
+      <div class="acoes-cardapio">
+        <button class="btn" type="button" onclick="salvarCardapioSemana()">Salvar cardápio da semana</button>
+        <button class="btn secundario" type="button" onclick="limparCardapioSemana()">Limpar semana</button>
+        <span id="cardapio-msg" class="small" role="status"></span>
+      </div>
+    </section>
+
+    <section class="card painel-admin" aria-labelledby="titulo-pedidos">
+      <h2 id="titulo-pedidos" class="secao-titulo"><span>📋 Pedidos em tempo real</span><span class="risco" aria-hidden="true"></span></h2>
+      <p class="small">Todos os itens retirados da cozinha aparecem aqui automaticamente para quem tiver esta página aberta.</p>
+      <div class="wrap-tabela">
+        <table class="tabela">
+          <caption class="rotulo-oculto">Lista de pedidos registrados pelos funcionários</caption>
+          <thead>
+            <tr>
+              <th scope="col">Dia</th><th scope="col">Hora</th><th scope="col">Equipe</th>
+              <th scope="col">Nome</th><th scope="col">Contato</th><th scope="col">Itens</th>
+              <th scope="col">Total</th><th scope="col"><span class="rotulo-oculto">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody id="tabela-pedidos"><tr><td colspan="8" class="small">Carregando…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card painel-admin" aria-labelledby="titulo-fechamento">
+      <h2 id="titulo-fechamento" class="secao-titulo"><span>🧾 Fechamento mensal (todo dia 1)</span><span class="risco" aria-hidden="true"></span></h2>
+      <p class="small">Gere o PDF com tudo o que saiu da cozinha no mês selecionado, por produto e por pessoa, para a cobrança do dia 1.</p>
+      <p id="aviso-fechamento" class="alerta hidden" role="status"></p>
+      <div class="row">
+        <div class="col campo-simples">
+          <label for="mes-fechar">Mês a fechar</label>
+          <input type="month" id="mes-fechar">
+        </div>
+        <div class="col col-acao">
+          <button class="btn verde" type="button" onclick="gerarFechamentoPDF()">Gerar PDF do fechamento</button>
+          <button class="btn secundario" type="button" onclick="baixarPlanilha()">Baixar planilha (CSV)</button>
+        </div>
+      </div>
+      <div class="linha-perigo">
+        <button class="btn perigo" type="button" onclick="limparMes()">Limpar pedidos deste mês</button>
+        <span class="small texto-centralizado">Use depois de baixar o PDF, para começar o mês seguinte zerado.</span>
+      </div>
+    </section>
+
+    <section class="card painel-admin" aria-labelledby="titulo-senha">
+      <h2 id="titulo-senha" class="secao-titulo"><span>🔑 Alterar login e senha</span><span class="risco" aria-hidden="true"></span></h2>
+      <form id="form-nova-senha" onsubmit="salvarNovaSenha(); return false;">
+        <div class="row">
+          <div class="col campo-simples">
+            <label for="nv-user">Novo login</label>
+            <input id="nv-user" name="novo-login" autocomplete="off">
+          </div>
+          <div class="col campo-simples">
+            <label for="nv-pass">Nova senha (mín. 6 caracteres)</label>
+            <input id="nv-pass" name="nova-senha" type="password" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="acoes-cardapio">
+          <button class="btn" type="submit">Salvar novo acesso</button>
+          <span id="nv-msg" class="small" role="status"></span>
+        </div>
+      </form>
+    </section>
+  </div>
+</section>
+
+</main>
+
+<footer class="rodape">
+  <p>Cozinha da Tere · feito com carinho<br><span>Pegou, anotou, pagou no dia 1</span></p>
+</footer>
+
+<!-- Barra fixa do carrinho: só aparece quando há algum item escolhido -->
+<div id="carrinho-flutuante" class="carrinho-flutuante hidden" role="status" aria-label="Resumo do carrinho">
+  <p class="cart-info"><strong id="carrinho-qtd">0</strong> <span id="carrinho-rot">itens</span> · <strong id="carrinho-total" class="cart-total">R$ 0,00</strong></p>
+  <div class="carrinho-acoes">
+    <button class="btn secundario" type="button" onclick="mostrarCarrinho()">Ver carrinho</button>
+    <button class="btn" type="button" onclick="finalizarPedido()">Finalizar</button>
+  </div>
+</div>
+
+<!-- Janela com a lista detalhada do carrinho -->
+<div id="modal-carrinho" class="hidden overlay-carrinho" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-carrinho">
+  <div class="card modal-carrinho-conteudo">
+    <h2 id="titulo-modal-carrinho" class="secao-titulo">Seu pedido</h2>
+    <div id="lista-carrinho"></div>
+    <p class="total-carrinho-modal">Total: <span id="modal-total">R$ 0,00</span></p>
+    <button class="btn secundario btn-largo" type="button" onclick="fecharModalCarrinho()">Fechar</button>
+  </div>
+</div>
+
+<!--
+  ORDEM DOS SCRIPTS — IMPORTANTE:
+  Os arquivos de "dados" vêm primeiro (são só listas e fotos, sem lógica).
+  Depois vêm os módulos de lógica, numa ordem que não importa muito entre
+  si, MAS js/app.js tem que ser sempre o ÚLTIMO, porque ele é quem liga
+  tudo e já começa a rodar assim que a página carrega.
+-->
+<script src="dados/produtos.js"></script>
+<script src="dados/imagens-produtos.js"></script>
+<script src="dados/banco-pratos-padrao.js"></script>
+
+<script src="js/utilitarios.js"></script>
+<script src="js/armazenamento.js"></script>
+<script src="js/autenticacao.js"></script>
+<script src="js/produtos-ui.js"></script>
+<script src="js/carrinho.js"></script>
+<script src="js/administracao.js"></script>
+<script src="js/cardapio-semana.js"></script>
+<script src="js/banco-fotos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
