@@ -2,7 +2,15 @@ import { neon } from '@neondatabase/serverless';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-export const sql = neon(process.env.DATABASE_URL);
+const URL_DB = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+export const sql = neon(URL_DB || 'postgresql://sem:sem@localhost/sem'); // evita travar na carga; checkEnv() avisa o que falta
+
+// Diz com clareza o que está faltando na Vercel
+export const checkEnv = () => {
+  const falta = (m) => Object.assign(new Error(m), { status: 500 });
+  if (!URL_DB) throw falta('Falta a variável DATABASE_URL: conecte o banco Neon ao projeto na Vercel e faça Redeploy.');
+  if (!process.env.JWT_SECRET) throw falta('Falta a variável JWT_SECRET na Vercel: crie em Settings > Environment Variables e faça Redeploy.');
+};
 export { bcrypt };
 
 // Tabelas criadas automaticamente na primeira chamada (não precisa rodar SQL na mão)
