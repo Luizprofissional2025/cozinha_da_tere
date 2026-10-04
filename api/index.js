@@ -1,4 +1,4 @@
-import { sql, ensure, bcrypt, sign, who } from './_lib.js';
+import { sql, ensure, checkEnv, bcrypt, sign, who } from './_lib.js';
 import { BASE } from './_catalog.js';
 
 const TEAMS = ['EVA', 'VIVA', 'ED', 'BANCAR', 'DEV'];
@@ -134,12 +134,14 @@ const actions = {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
   try {
+    checkEnv();
     await ensure();
     const { action, ...body } = req.body || {};
     if (!actions[action]) bad('Ação inválida');
     res.status(200).json((await actions[action](body, who(req))) ?? { ok: true });
   } catch (e) {
     if (!e.status) console.error(e);
-    res.status(e.status || 500).json({ error: e.status ? e.message : 'Erro no servidor' });
+    // sem status = erro inesperado: mostra o motivo para facilitar achar o problema
+    res.status(e.status || 500).json({ error: e.status ? e.message : 'Erro no servidor: ' + String(e.message).slice(0, 140) });
   }
 }
